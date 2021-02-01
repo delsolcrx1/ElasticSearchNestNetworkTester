@@ -7,21 +7,20 @@ using System;
 using System.Configuration;
 using System.Dynamic;
 using System.Net;
-using System.Text;
 
 namespace ES.Simulator
 {
     class ElasticSearchAdapter
     {
-        public static bool FenergoIndexTraceEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings["FenergoIndexTraceEnabled"].ToString());
-        public static string FenergoIndexUsername = ConfigurationManager.AppSettings["FenergoIndexUsername"].ToString();
-        public static string FenergoIndexPassword = ConfigurationManager.AppSettings["FenergoIndexPassword"].ToString();
-        public static bool FenergoIndexUntrustedSslCert = Convert.ToBoolean(ConfigurationManager.AppSettings["FenergoIndexUntrustedSslCert"].ToString());
-        public static string IndexHostName = ConfigurationManager.AppSettings["FenergoIndexHost"].ToString();
-        public static string FenergoIndexPrefix = ConfigurationManager.AppSettings["FenergoIndexPrefix"].ToString();
-        public static int FenergoIndexId = Convert.ToInt32(ConfigurationManager.AppSettings["FenergoIndexId"].ToString());
-        public static int FenergoIndexKeepAliveTime = Convert.ToInt32(ConfigurationManager.AppSettings["FenergoIndexKeepAliveTime"].ToString());
-        public static int FenergoIndexKeepAliveInterval = Convert.ToInt32(ConfigurationManager.AppSettings["FenergoIndexKeepAliveInterval"].ToString());
+        public static bool IndexTraceEnabled = Convert.ToBoolean(ConfigurationManager.AppSettings["IndexTraceEnabled"].ToString());
+        public static string IndexUsername = ConfigurationManager.AppSettings["IndexUsername"].ToString();
+        public static string IndexPassword = ConfigurationManager.AppSettings["IndexPassword"].ToString();
+        public static bool IndexUntrustedSslCert = Convert.ToBoolean(ConfigurationManager.AppSettings["IndexUntrustedSslCert"].ToString());
+        public static string IndexHostName = ConfigurationManager.AppSettings["IndexHost"].ToString();
+        public static string IndexPrefix = ConfigurationManager.AppSettings["IndexPrefix"].ToString();
+        public static int IndexId = Convert.ToInt32(ConfigurationManager.AppSettings["IndexId"].ToString());
+        public static int IndexKeepAliveTime = Convert.ToInt32(ConfigurationManager.AppSettings["IndexKeepAliveTime"].ToString());
+        public static int IndexKeepAliveInterval = Convert.ToInt32(ConfigurationManager.AppSettings["IndexKeepAliveInterval"].ToString());
         public static int ErrorCount = 0;
         public static int SuccessCount = 0;
 
@@ -42,13 +41,13 @@ namespace ES.Simulator
                             TypeNameHandling = TypeNameHandling.Auto
                         }));
 
-                //settings.EnableTcpKeepAlive(
-                //    TimeSpan.FromMilliseconds(FenergoIndexKeepAliveTime),
-                //    TimeSpan.FromMilliseconds(FenergoIndexKeepAliveInterval));
+                settings.EnableTcpKeepAlive(
+                    TimeSpan.FromMilliseconds(IndexKeepAliveTime),
+                    TimeSpan.FromMilliseconds(IndexKeepAliveInterval));
 
                 //settings.EnableDebugMode();
 
-                if (FenergoIndexTraceEnabled)
+                if (IndexTraceEnabled)
                 {
                     settings = settings.DisableDirectStreaming()
                     .OnRequestCompleted(details =>
@@ -70,12 +69,12 @@ namespace ES.Simulator
                     });
                 }
 
-                if (FenergoIndexUntrustedSslCert &&
+                if (IndexUntrustedSslCert &&
                     ServicePointManager.ServerCertificateValidationCallback == null)
                 {
                     ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, errors) => true;
                 }
-                settings = settings.BasicAuthentication(FenergoIndexUsername, FenergoIndexPassword);
+                settings = settings.BasicAuthentication(IndexUsername, IndexPassword);
 
                 return new ElasticClient(settings);
             }
@@ -114,8 +113,8 @@ namespace ES.Simulator
         {
             try
             {
-                var response = client.Get<ExpandoObject>(new GetRequest(FenergoIndexPrefix + "task",
-                                    "task", FenergoIndexId)) as GetResponse<ExpandoObject>;
+                var response = client.Get<ExpandoObject>(new GetRequest(IndexPrefix + "task",
+                                    "task", IndexId)) as GetResponse<ExpandoObject>;
 
                 //var result = await client.GetIndexAsync(null, c => c
                 //                     .AllIndices()
